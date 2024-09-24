@@ -16,14 +16,14 @@ spec:
     spec:
       containers:
         - name: mypage
-          image: "username/mypage:latest"
+          image: "mink93/mypage:20240924"
           ports:
             - containerPort: 8080
           readinessProbe:
             httpGet:
               path: '/actuator/health'
               port: 8080
-            initialDelaySeconds: 10
+            initialDelaySeconds: 20
             timeoutSeconds: 2
             periodSeconds: 5
             failureThreshold: 10

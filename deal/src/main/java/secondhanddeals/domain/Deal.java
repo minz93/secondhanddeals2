@@ -35,17 +35,22 @@ public class Deal {
 
     @PostUpdate
     public void onPostUpdate() {
-        DealReserved dealReserved = new DealReserved(this);
-        dealReserved.publishAfterCommit();
-
-        DealCanceled dealCanceled = new DealCanceled(this);
-        dealCanceled.publishAfterCommit();
-
-        DealEnded dealEnded = new DealEnded(this);
-        dealEnded.publishAfterCommit();
-
-        NegotiationCanceled negotiationCanceled = new NegotiationCanceled(this);
-        negotiationCanceled.publishAfterCommit();
+        if(this.status.equals("dealReserved")) {
+            DealReserved dealReserved = new DealReserved(this);
+            dealReserved.publishAfterCommit();
+        } else if(this.status.equals("dealCanceled")) {
+            DealCanceled dealCanceled = new DealCanceled(this);
+            dealCanceled.publishAfterCommit();
+        } else if(this.status.equals("dealEnded")) {
+            DealEnded dealEnded = new DealEnded(this);
+            dealEnded.publishAfterCommit();
+            
+            repository().findById(Long.valueOf(dealEnded.getDealId())).ifPresent(deal->{
+                NegotiationCanceled negotiationCanceled = new NegotiationCanceled(deal);
+                negotiationCanceled.setOfferId(dealEnded.getOfferId());
+                negotiationCanceled.publishAfterCommit();
+            });
+        }
     }
 
     @PrePersist
